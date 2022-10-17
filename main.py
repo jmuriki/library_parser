@@ -8,18 +8,27 @@ def create_folder_safely(folder_name="library"):
     return folder_name
 
 
-def save_text(url, filename):
-    response = requests.get(url)
-    response.raise_for_status()
+def save_text(response, filename):
     with open(Path(f"./{filename}"), "w") as file:
         file.write(response.text)
+
+
+def check_for_redirect(response):
+    if response.history != []:
+        raise HTTPError
 
 
 def main():
     library_path = create_folder_safely()
     for id in range(1, 11):
         url = f"https://tululu.org/txt.php?id={id}"
-        save_text(url, Path(f"{library_path}/id_{id}.txt"))
+        response = requests.get(url)
+        response.raise_for_status()
+        try:
+            check_for_redirect(response)
+            save_text(response, Path(f"{library_path}/id_{id}.txt"))
+        except:
+            continue
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
+import os
 import requests
 
 from pathlib import Path
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
 
 
@@ -12,33 +14,52 @@ def check_for_redirect(url):
         raise HTTPError
 
 
-def get_title(id):
-    url = f"https://tululu.org/b{id}"
+def get_soup(url, id):
+    url = f"{url}b{id}"
     response = requests.get(url)
     response.raise_for_status()
-    soup = BeautifulSoup(response.text, "lxml")
+    return BeautifulSoup(response.text, "lxml")
+
+
+def get_title(soup):
     title_tag = soup.find("body").find("table", class_="tabs").find("h1")
-    title = title_tag.text.split("::")[0].strip()
-    return title
+    return title_tag.text.split("::")[0].strip()
 
 
 def download_txt(url, filename, folder='books/'):
     response = requests.get(url)
     response.raise_for_status()
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
-    with open(Path(f"./{folder}{filename}"), "w") as file:
+    path = Path(f"./{folder}{filename}")
+    with open(path, "w") as file:
         file.write(response.text)
     return path
 
 
+def download_image(url, filename, folder='images/'):
+    response = requests.get(url)
+    response.raise_for_status()
+    Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
+    path = Path(f"./{folder}{filename}")
+    with open(path, "wb") as file:
+        file.write(response.content)
+    return path
+
+
 def main():
+    url = "https://tululu.org/"
     for id in range(1, 11):
-        url = f"https://tululu.org/txt.php?id={id}"
+        txt_url = f"{url}txt.php?id={id}"
         try:
-            check_for_redirect(url)
-            title = get_title(id)
+            check_for_redirect(txt_url)
+            soup = get_soup(url, id)
+            title = get_title(soup)
             filename = sanitize_filename(f"{id}. {title}.txt")
             download_txt(url, filename)
+            rel_link = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+            pic_url = urljoin(url, rel_link)            
+            pic_name = os.path.split(rel_link)[-1]
+            download_image(pic_url, pic_name)
         except:
             continue
 

@@ -81,9 +81,12 @@ def main():
             check_for_redirect(txt_url)
             soup = get_soup(url, id)
             title = get_title(soup)
+            print("Заголовок: ", title)
             filename = sanitize_filename(f"{id}. {title}.txt")
             download_txt(url, filename)
             comments_guide = compile_commets_guide(comments_guide, soup, filename)
+            genre = soup.find("span", class_="d_book").find("a")
+            print(genre.text, "\n")
             rel_link = soup.find("body").find("div", class_="bookimage").find("img")["src"]
             pic_url = urljoin(url, rel_link)            
             pic_name = os.path.split(rel_link)[-1]

@@ -1,0 +1,5 @@
+requests
+pathlib
+BeautifulSoup4
+lxml
+pathvalidate

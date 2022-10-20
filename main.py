@@ -1,10 +1,18 @@
 import os
 import requests
+import argparse
 
 from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
+
+
+def create_parser(arg_1, arg_2):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(arg_1, default=1, type=int)
+    parser.add_argument(arg_2, default=10, type=int)
+    return parser
 
 
 def check_for_redirect(url):
@@ -93,8 +101,10 @@ def save_comments(comments_guide, filename="Гид по отзывам.txt", fol
 
 def main():
     url = "https://tululu.org/"
+    start_id = create_parser("--start_id", "--end_id").parse_args().start_id
+    end_id = create_parser("--start_id", "--end_id").parse_args().end_id
     comments_guide = []
-    for id in range(1, 11):
+    for id in range(start_id, end_id + 1):
         txt_url = f"{url}txt.php?id={id}"
         try:
             check_for_redirect(txt_url)

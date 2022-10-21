@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import argparse
 
@@ -118,7 +119,15 @@ def main():
             pic_name = parsed_page['pic_name']
             download_image(pic_url, pic_name)
             comments_guide.append(compile_commets_guide(parsed_page))
-        except:
+        except requests.exceptions.HTTPError as error:
+            print(error)
+            continue
+        except requests.exceptions.ConnectionError as error:
+            print(error)
+            time.sleep(1)
+            continue
+        except Exception as error:
+            print(error)
             continue
     save_comments(comments_guide)
 

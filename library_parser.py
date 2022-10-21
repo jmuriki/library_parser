@@ -21,8 +21,7 @@ def check_for_redirect(response):
         raise HTTPError
 
 
-def get_soup(url, book_id):
-    url = f"{url}b{book_id}/"
+def get_soup(url):
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -109,12 +108,13 @@ def main():
         params = {
         "id": book_id
         }
+        book_url = f"{url}b{book_id}/"
         try:
-            soup = get_soup(url, book_id)
+            soup = get_soup(book_url)
             parsed_page = parse_book_page(soup)
             filename = sanitize_filename(f"{book_id}. {parsed_page['title']}.txt")
             download_txt(txt_url, params, filename)
-            pic_url = urljoin(url, parsed_page['pic_rel_path'])
+            pic_url = urljoin(book_url, parsed_page['pic_rel_path'])
             pic_name = parsed_page['pic_name']
             download_image(pic_url, pic_name)
             comments_guide.append(compile_commets_guide(parsed_page))

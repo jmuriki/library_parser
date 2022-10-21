@@ -22,9 +22,10 @@ def check_for_redirect(response):
 
 
 def get_soup(url, book_id):
-    url = f"{url}b{book_id}"
+    url = f"{url}b{book_id}/"
     response = requests.get(url)
     response.raise_for_status()
+    check_for_redirect(response)
     return BeautifulSoup(response.text, "lxml")
 
 
@@ -59,7 +60,8 @@ def parse_book_page(soup):
     parsed_page["Заголовок"], parsed_page["Автор"] = split_title_tag(soup)
     parsed_page["Жанр"] = get_genres(soup)
     parsed_page["Отзывы"] = get_comments_texts(soup)
-    parsed_page["Обложка"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    parsed_page["Путь обложки"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    parsed_page["Имя обложки"] = os.path.split(parsed_page["Путь обложки"])[-1]
     return parsed_page
 
 
@@ -73,9 +75,10 @@ def compile_commets_guide(parsed_page):
     return "\n".join(guide)
 
 
-def download_txt(url, filename, folder="books/"):
-    response = requests.get(url)
+def download_txt(url, params, filename, folder="books/"):
+    response = requests.get(url, params)
     response.raise_for_status()
+    check_for_redirect(response)
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
     path = Path(f"./{folder}{filename}")
     with open(path, "w") as file:
@@ -86,6 +89,7 @@ def download_txt(url, filename, folder="books/"):
 def download_image(url, filename, folder="images/"):
     response = requests.get(url)
     response.raise_for_status()
+    check_for_redirect(response)
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
     path = Path(f"./{folder}{filename}")
     with open(path, "wb") as file:
@@ -112,15 +116,12 @@ def main():
         "id": book_id
         }
         try:
-            response = requests.get(url, params)
-            response.raise_for_status()
-            check_for_redirect(response)
             soup = get_soup(url, book_id)
             parsed_page = parse_book_page(soup)
             filename = sanitize_filename(f"{book_id}. {parsed_page['Заголовок']}.txt")
-            download_txt(url, filename)
-            pic_url = urljoin(url, parsed_page["Обложка"])
-            pic_name = os.path.split(parsed_page["Обложка"])[-1]
+            download_txt(txt_url, params, filename)
+            pic_url = urljoin(url, parsed_page["Путь обложки"])
+            pic_name = parsed_page["Имя обложки"]
             download_image(pic_url, pic_name)
             comments_guide.append(compile_commets_guide(parsed_page))
         except:

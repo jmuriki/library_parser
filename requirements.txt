@@ -1,5 +1,6 @@
-requests
-pathlib
-BeautifulSoup4
-lxml
-pathvalidate
+beautifulsoup4==4.11.1
+lxml==4.9.1
+pathlib==1.0.1
+pathvalidate==2.5.2
+requests==2.28.1
+tqdm==4.64.1

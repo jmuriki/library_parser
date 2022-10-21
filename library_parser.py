@@ -2,6 +2,7 @@ import os
 import requests
 import argparse
 
+from tqdm import tqdm
 from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -105,7 +106,7 @@ def main():
     start_id = arguments.start_id
     end_id = arguments.end_id
     comments_guide = []
-    for book_id in range(start_id, end_id + 1):
+    for book_id in tqdm(range(start_id, end_id + 1)):
         txt_url = f"{url}txt.php"
         params = {
         "id": book_id

@@ -51,20 +51,20 @@ def get_comments_texts(soup):
 
 def parse_book_page(soup):
     parsed_page = {}
-    parsed_page["Заголовок"], parsed_page["Автор"] = split_title_tag(soup)
-    parsed_page["Жанр"] = get_genres(soup)
-    parsed_page["Отзывы"] = get_comments_texts(soup)
-    parsed_page["Путь обложки"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
-    parsed_page["Имя обложки"] = os.path.split(parsed_page["Путь обложки"])[-1]
+    parsed_page['title'], parsed_page['author'] = split_title_tag(soup)
+    parsed_page['genres'] = get_genres(soup)
+    parsed_page['comments'] = get_comments_texts(soup)
+    parsed_page['pic_rel_path'] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    parsed_page['pic_name'] = os.path.split(parsed_page['pic_rel_path'])[-1]
     return parsed_page
 
 
 def compile_commets_guide(parsed_page):
     guide = []
-    guide.append(parsed_page["Заголовок"])
-    guide.append(parsed_page["Автор"])
-    if parsed_page["Отзывы"]:
-        guide.append(parsed_page["Отзывы"])
+    guide.append(parsed_page['title'])
+    guide.append(parsed_page['author'])
+    if parsed_page['comments']:
+        guide.append(parsed_page['comments'])
     guide.append("\n")
     return "\n".join(guide)
 
@@ -112,10 +112,10 @@ def main():
         try:
             soup = get_soup(url, book_id)
             parsed_page = parse_book_page(soup)
-            filename = sanitize_filename(f"{book_id}. {parsed_page['Заголовок']}.txt")
+            filename = sanitize_filename(f"{book_id}. {parsed_page['title']}.txt")
             download_txt(txt_url, params, filename)
-            pic_url = urljoin(url, parsed_page["Путь обложки"])
-            pic_name = parsed_page["Имя обложки"]
+            pic_url = urljoin(url, parsed_page['pic_rel_path'])
+            pic_name = parsed_page['pic_name']
             download_image(pic_url, pic_name)
             comments_guide.append(compile_commets_guide(parsed_page))
         except:

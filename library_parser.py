@@ -27,9 +27,12 @@ def get_soup(url, book_id):
     return BeautifulSoup(response.text, "lxml")
 
 
-def split_title(soup):
+def split_title_tag(soup):
     title_tag = soup.find("body").find("table", class_="tabs").find("h1")
-    return title_tag.text.split("::")
+    raw_title, raw_author = title_tag.text.split("::")
+    title = raw_title.strip()
+    author = raw_author.strip()
+    return title, author
 
 
 def get_genres(soup):
@@ -52,8 +55,8 @@ def get_comments_texts(soup):
 
 def parse_book_page(soup):
     book_parsed = {}
-    book_parsed["Заголовок"] = split_title(soup)[0].strip()
-    book_parsed["Автор"] = split_title(soup)[-1].strip()
+    book_parsed["Заголовок"], book_parsed["Автор"] = split_title_tag(soup)
+    print(book_parsed)
     book_parsed["Жанр"] = get_genres(soup)
     book_parsed["Отзывы"] = get_comments_texts(soup)
     book_parsed["Обложка"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]

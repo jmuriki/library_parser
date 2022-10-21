@@ -15,8 +15,8 @@ def create_parser(arg_1, arg_2):
     return parser
 
 
-def check_for_redirect(url):
-    response = requests.get(url)
+def check_for_redirect(url, params):
+    response = requests.get(url, params)
     response.raise_for_status()
     if response.history != []:
         raise HTTPError
@@ -106,9 +106,12 @@ def main():
     end_id = arguments.end_id
     comments_guide = []
     for book_id in range(start_id, end_id + 1):
-        txt_url = f"{url}txt.php?id={book_id}"
+        txt_url = f"{url}txt.php"
+        params = {
+        "id": book_id
+        }
         try:
-            check_for_redirect(txt_url)
+            check_for_redirect(txt_url, params)
             soup = get_soup(url, book_id)
             book_parsed = parse_book_page(soup)
             filename = sanitize_filename(f"{book_id}. {book_parsed['Заголовок']}.txt")

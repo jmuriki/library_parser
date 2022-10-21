@@ -22,8 +22,8 @@ def check_for_redirect(url):
         raise HTTPError
 
 
-def get_soup(url, id):
-    url = f"{url}b{id}"
+def get_soup(url, book_id):
+    url = f"{url}b{book_id}"
     response = requests.get(url)
     response.raise_for_status()
     return BeautifulSoup(response.text, "lxml")
@@ -105,13 +105,13 @@ def main():
     start_id = arguments.start_id
     end_id = arguments.end_id
     comments_guide = []
-    for id in range(start_id, end_id + 1):
-        txt_url = f"{url}txt.php?id={id}"
+    for book_id in range(start_id, end_id + 1):
+        txt_url = f"{url}txt.php?id={book_id}"
         try:
             check_for_redirect(txt_url)
-            soup = get_soup(url, id)
+            soup = get_soup(url, book_id)
             book_parsed = parse_book_page(soup)
-            filename = sanitize_filename(f"{id}. {book_parsed['Заголовок']}.txt")
+            filename = sanitize_filename(f"{book_id}. {book_parsed['Заголовок']}.txt")
             download_txt(url, filename)
             pic_url = urljoin(url, book_parsed["Обложка"])
             pic_name = os.path.split(book_parsed["Обложка"])[-1]

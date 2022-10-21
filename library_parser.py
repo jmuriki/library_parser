@@ -38,20 +38,14 @@ def split_title_tag(soup):
 
 
 def get_genres(soup):
-    genres = []
-    genres_tag = soup.find_all("span", class_="d_book")
-    for tag in genres_tag:
-        genre = tag.find("a").text
-        genres.append(genre)
+    genres_tags = soup.find_all("span", class_="d_book")
+    genres = [t.find("a").text for t in genres_tags]
     return "\n".join(genres)
 
 
 def get_comments_texts(soup):
-    texts = []
     comments = soup.find_all("div", class_="texts")
-    for comment in comments:
-        text = comment.find("span", class_="black").text
-        texts.append(text)
+    texts = [c.find("span", class_="black").text for c in comments]
     return "\n".join(texts)
 
 

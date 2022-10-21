@@ -54,21 +54,20 @@ def get_comments_texts(soup):
 
 
 def parse_book_page(soup):
-    book_parsed = {}
-    book_parsed["Заголовок"], book_parsed["Автор"] = split_title_tag(soup)
-    print(book_parsed)
-    book_parsed["Жанр"] = get_genres(soup)
-    book_parsed["Отзывы"] = get_comments_texts(soup)
-    book_parsed["Обложка"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
-    return book_parsed
+    parsed_page = {}
+    parsed_page["Заголовок"], parsed_page["Автор"] = split_title_tag(soup)
+    parsed_page["Жанр"] = get_genres(soup)
+    parsed_page["Отзывы"] = get_comments_texts(soup)
+    parsed_page["Обложка"] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    return parsed_page
 
 
-def compile_commets_guide(book_parsed):
+def compile_commets_guide(parsed_page):
     guide = []
-    guide.append(book_parsed["Заголовок"])
-    guide.append(book_parsed["Автор"])
-    if book_parsed["Отзывы"]:
-        guide.append(book_parsed["Отзывы"])
+    guide.append(parsed_page["Заголовок"])
+    guide.append(parsed_page["Автор"])
+    if parsed_page["Отзывы"]:
+        guide.append(parsed_page["Отзывы"])
     guide.append("\n")
     return "\n".join(guide)
 
@@ -116,13 +115,13 @@ def main():
             response.raise_for_status()
             check_for_redirect(response)
             soup = get_soup(url, book_id)
-            book_parsed = parse_book_page(soup)
-            filename = sanitize_filename(f"{book_id}. {book_parsed['Заголовок']}.txt")
+            parsed_page = parse_book_page(soup)
+            filename = sanitize_filename(f"{book_id}. {parsed_page['Заголовок']}.txt")
             download_txt(url, filename)
-            pic_url = urljoin(url, book_parsed["Обложка"])
-            pic_name = os.path.split(book_parsed["Обложка"])[-1]
+            pic_url = urljoin(url, parsed_page["Обложка"])
+            pic_name = os.path.split(parsed_page["Обложка"])[-1]
             download_image(pic_url, pic_name)
-            comments_guide.append(compile_commets_guide(book_parsed))
+            comments_guide.append(compile_commets_guide(parsed_page))
         except:
             continue
     save_comments(comments_guide)

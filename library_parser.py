@@ -18,7 +18,7 @@ def create_parser(arg_1, arg_2):
 def check_for_redirect(url, params):
     response = requests.get(url, params)
     response.raise_for_status()
-    if response.history != []:
+    if response.history:
         raise HTTPError
 
 

@@ -10,10 +10,10 @@ from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
 
 
-def create_parser(arg_1, arg_2):
+def create_parser():
     parser = argparse.ArgumentParser(description="Опциональные аргументы. По умолчанию 1 и 10 соответственно.")
-    parser.add_argument("-s", arg_1, default=1, type=int)
-    parser.add_argument("-e", arg_2, default=10, type=int)
+    parser.add_argument("-s", "--start_id", default=1, type=int)
+    parser.add_argument("-e", "--end_id", default=10, type=int)
     return parser
 
 
@@ -22,8 +22,8 @@ def check_for_redirect(response):
         raise HTTPError
 
 
-def get_soup(url):
-    response = requests.get(url)
+def get_soup(book_url):
+    response = requests.get(book_url)
     response.raise_for_status()
     check_for_redirect(response)
     return BeautifulSoup(response.text, "lxml")
@@ -69,23 +69,23 @@ def compile_commets_guide(parsed_page):
     return "\n".join(guide)
 
 
-def download_txt(url, params, filename, folder="books/"):
-    response = requests.get(url, params)
+def download_txt(txt_url, params, txt_name, folder="books/"):
+    response = requests.get(txt_url, params)
     response.raise_for_status()
     check_for_redirect(response)
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
-    path = Path(f"./{folder}{filename}")
+    path = Path(f"./{folder}{txt_name}")
     with open(path, "w") as file:
         file.write(response.text)
     return path
 
 
-def download_image(url, filename, folder="images/"):
-    response = requests.get(url)
+def download_image(pic_url, pic_name, folder="images/"):
+    response = requests.get(pic_url)
     response.raise_for_status()
     check_for_redirect(response)
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
-    path = Path(f"./{folder}{filename}")
+    path = Path(f"./{folder}{pic_name}")
     with open(path, "wb") as file:
         file.write(response.content)
     return path
@@ -100,7 +100,7 @@ def save_comments(comments_guide, filename="Гид по отзывам.txt", fol
 
 def main():
     url = "https://tululu.org/"
-    arguments = create_parser("--start_id", "--end_id").parse_args()
+    arguments = create_parser().parse_args()
     start_id = arguments.start_id
     end_id = arguments.end_id
     comments_guide = []
@@ -113,17 +113,17 @@ def main():
         try:
             soup = get_soup(book_url)
             parsed_page = parse_book_page(soup)
-            filename = sanitize_filename(f"{book_id}. {parsed_page['title']}.txt")
-            download_txt(txt_url, params, filename)
+            txt_name = sanitize_filename(f"{book_id}. {parsed_page['title']}.txt")
+            download_txt(txt_url, params, txt_name)
             pic_url = urljoin(book_url, parsed_page['pic_rel_path'])
             pic_name = parsed_page['pic_name']
             download_image(pic_url, pic_name)
             comments_guide.append(compile_commets_guide(parsed_page))
-        except requests.exceptions.HTTPError as error:
-            print(error)
+        except requests.exceptions.HTTPError:
+            print(requests.exceptions.HTTPError)
             continue
-        except requests.exceptions.ConnectionError as error:
-            print(error)
+        except requests.exceptions.ConnectionError:
+            print(requests.exceptions.ConnectionError)
             time.sleep(1)
             continue
         except Exception as error:

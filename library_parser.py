@@ -15,9 +15,7 @@ def create_parser(arg_1, arg_2):
     return parser
 
 
-def check_for_redirect(url, params):
-    response = requests.get(url, params)
-    response.raise_for_status()
+def check_for_redirect(response):
     if response.history:
         raise HTTPError
 
@@ -111,7 +109,9 @@ def main():
         "id": book_id
         }
         try:
-            check_for_redirect(txt_url, params)
+            response = requests.get(url, params)
+            response.raise_for_status()
+            check_for_redirect(response)
             soup = get_soup(url, book_id)
             book_parsed = parse_book_page(soup)
             filename = sanitize_filename(f"{book_id}. {book_parsed['Заголовок']}.txt")

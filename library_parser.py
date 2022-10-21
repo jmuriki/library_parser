@@ -9,9 +9,9 @@ from pathvalidate import sanitize_filename
 
 
 def create_parser(arg_1, arg_2):
-    parser = argparse.ArgumentParser()
-    parser.add_argument(arg_1, default=1, type=int)
-    parser.add_argument(arg_2, default=10, type=int)
+    parser = argparse.ArgumentParser(description="Опциональные аргументы. По умолчанию 1 и 10 соответственно.")
+    parser.add_argument("-s", arg_1, default=1, type=int)
+    parser.add_argument("-e", arg_2, default=10, type=int)
     return parser
 
 
@@ -101,8 +101,9 @@ def save_comments(comments_guide, filename="Гид по отзывам.txt", fol
 
 def main():
     url = "https://tululu.org/"
-    start_id = create_parser("--start_id", "--end_id").parse_args().start_id
-    end_id = create_parser("--start_id", "--end_id").parse_args().end_id
+    arguments = create_parser("--start_id", "--end_id").parse_args()
+    start_id = arguments.start_id
+    end_id = arguments.end_id
     comments_guide = []
     for id in range(start_id, end_id + 1):
         txt_url = f"{url}txt.php?id={id}"

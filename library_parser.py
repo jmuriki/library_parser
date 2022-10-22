@@ -59,7 +59,7 @@ def parse_book_page(soup):
     return parsed_page
 
 
-def compile_commets_guide(parsed_page):
+def compile_comments_guide(parsed_page):
     guide = []
     guide.append(parsed_page['title'])
     guide.append(parsed_page['author'])
@@ -118,7 +118,7 @@ def main():
             pic_url = urljoin(book_url, parsed_page['pic_rel_path'])
             pic_name = parsed_page['pic_name']
             download_image(pic_url, pic_name)
-            comments_guide.append(compile_commets_guide(parsed_page))
+            comments_guide.append(compile_comments_guide(parsed_page))
         except requests.exceptions.HTTPError:
             print(requests.exceptions.HTTPError)
             continue

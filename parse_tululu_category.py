@@ -23,7 +23,7 @@ def get_soup(url):
 
 
 def split_title_tag(soup):
-    title_tag = soup.find("body").find("table", class_="tabs").find("h1")
+    title_tag = soup.select_one("table.tabs h1")
     raw_title, raw_author = title_tag.text.split("::")
     title = raw_title.strip()
     author = raw_author.strip()
@@ -31,14 +31,14 @@ def split_title_tag(soup):
 
 
 def get_genres(soup):
-    genres_tags = soup.find_all("span", class_="d_book")
-    genres = [tag.find("a").text for tag in genres_tags]
+    genres_tags = soup.select("span.d_book a")
+    genres = [tag.text for tag in genres_tags]
     return genres
 
 
 def get_comments_texts(soup):
-    comments = soup.find_all("div", class_="texts")
-    texts = [comment.find("span", class_="black").text for comment in comments]
+    comments = soup.select("div.texts span.black")
+    texts = [comment.text for comment in comments]
     return texts
 
 
@@ -47,7 +47,7 @@ def parse_book_page(soup):
     parsed_page['title'], parsed_page['author'] = split_title_tag(soup)
     parsed_page['genres'] = get_genres(soup)
     parsed_page['comments'] = get_comments_texts(soup)
-    parsed_page['pic_rel_path'] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    parsed_page['pic_rel_path'] = soup.select_one("body div.bookimage img")["src"]
     parsed_page['pic_name'] = os.path.split(parsed_page['pic_rel_path'])[-1]
     return parsed_page
 
@@ -57,8 +57,8 @@ def get_books_rel_paths(url, genre, total_pages):
     for page in range(1, total_pages + 1):
         genre_url = f"{url}l{genre}/{page}/"
         soup = get_soup(genre_url)
-        tables = soup.find_all("table", class_="d_book")
-        paths.extend([table.find("a")["href"] for table in tables])
+        tables = soup.select("table.d_book")
+        paths.extend([table.select_one("a")["href"] for table in tables])
     return paths
 
 

@@ -19,10 +19,14 @@ def get_books_rel_paths(soup):
 def main():
     url = "https://tululu.org/"
     genre = 55
+    total_pages = 10
+    books_rel_paths = []
     page = 1
-    genre_page_url = f"{url}l{genre}/{page}/"
-    soup = get_soup(genre_page_url)
-    books_rel_paths = get_books_rel_paths(soup)
+    while page <= total_pages:
+        genre_page_url = f"{url}l{genre}/{page}/"
+        soup = get_soup(genre_page_url)
+        books_rel_paths.extend(get_books_rel_paths(soup))
+        page += 1
     books_urls = [urljoin(url, path) for path in books_rel_paths]
     print(books_urls)
 

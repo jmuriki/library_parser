@@ -10,10 +10,10 @@ def get_soup(genre_page_url):
     return BeautifulSoup(response.text, "lxml")
 
 
-def get_book_rel_path(soup):
-    table = soup.find("table", class_="d_book")
-    path = table.find("a")["href"]
-    return path
+def get_books_rel_paths(soup):
+    tables = soup.find_all("table", class_="d_book")
+    paths = [t.find("a")["href"] for t in tables]
+    return paths
 
 
 def main():
@@ -22,9 +22,9 @@ def main():
     page = 1
     genre_page_url = f"{url}l{genre}/{page}/"
     soup = get_soup(genre_page_url)
-    book_rel_path = get_book_rel_path(soup)
-    book_url = urljoin(url, book_rel_path)
-    print(book_url)
+    books_rel_paths = get_books_rel_paths(soup)
+    books_urls = [urljoin(url, path) for path in books_rel_paths]
+    print(books_urls)
 
 
 if __name__ == "__main__":

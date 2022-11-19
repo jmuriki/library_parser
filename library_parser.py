@@ -18,19 +18,20 @@ def create_parser():
 
 
 def check_for_redirect(response):
-    if response.history:
-        raise HTTPError
+    response_history = response.history
+    if response_history:
+        raise requests.exceptions.HTTPError(response_history)
 
 
-def get_soup(book_url):
-    response = requests.get(book_url)
+def get_soup(url):
+    response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
     return BeautifulSoup(response.text, "lxml")
 
 
 def split_title_tag(soup):
-    title_tag = soup.find("body").find("table", class_="tabs").find("h1")
+    title_tag = soup.select_one("table.tabs h1")
     raw_title, raw_author = title_tag.text.split("::")
     title = raw_title.strip()
     author = raw_author.strip()
@@ -38,15 +39,15 @@ def split_title_tag(soup):
 
 
 def get_genres(soup):
-    genres_tags = soup.find_all("span", class_="d_book")
-    genres = [t.find("a").text for t in genres_tags]
-    return "\n".join(genres)
+    genres_tags = soup.select("span.d_book a")
+    genres = [tag.text for tag in genres_tags]
+    return genres 
 
 
 def get_comments_texts(soup):
-    comments = soup.find_all("div", class_="texts")
-    texts = [c.find("span", class_="black").text for c in comments]
-    return "\n".join(texts)
+    comments = soup.select("div.texts span.black")
+    texts = [comment.text for comment in comments]
+    return texts
 
 
 def parse_book_page(soup):
@@ -54,7 +55,7 @@ def parse_book_page(soup):
     parsed_page['title'], parsed_page['author'] = split_title_tag(soup)
     parsed_page['genres'] = get_genres(soup)
     parsed_page['comments'] = get_comments_texts(soup)
-    parsed_page['pic_rel_path'] = soup.find("body").find("div", class_="bookimage").find("img")["src"]
+    parsed_page['pic_rel_path'] = soup.select_one("body div.bookimage img")["src"]
     parsed_page['pic_name'] = os.path.split(parsed_page['pic_rel_path'])[-1]
     return parsed_page
 
@@ -69,26 +70,26 @@ def compile_comments_guide(parsed_page):
     return "\n".join(guide)
 
 
-def download_txt(txt_url, params, txt_name, folder="books/"):
+def download_txt(txt_url, params, txt_name, dest_folder=".", folder="books"):
     response = requests.get(txt_url, params)
     response.raise_for_status()
     check_for_redirect(response)
-    Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
-    path = Path(f"./{folder}{txt_name}")
+    Path(f"{dest_folder}/{folder}").mkdir(parents=True, exist_ok=True)
+    path = Path(f"{dest_folder}/{folder}/{txt_name}")
     with open(path, "w") as file:
         file.write(response.text)
-    return path
+    return str(path)
 
 
-def download_image(pic_url, pic_name, folder="images/"):
+def download_image(pic_url, pic_name, dest_folder=".", folder="images"):
     response = requests.get(pic_url)
     response.raise_for_status()
     check_for_redirect(response)
-    Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
-    path = Path(f"./{folder}{pic_name}")
+    Path(f"{dest_folder}/{folder}").mkdir(parents=True, exist_ok=True)
+    path = Path(f"{dest_folder}/{folder}/{pic_name}")
     with open(path, "wb") as file:
         file.write(response.content)
-    return path
+    return str(path)
 
 
 def save_comments(comments_guide, filename="Гид по отзывам.txt", folder="books/"):

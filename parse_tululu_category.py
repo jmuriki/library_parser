@@ -22,7 +22,8 @@ from library_parser import get_comments_texts
 def create_parser():
     parser = argparse.ArgumentParser(
         description="""Все представленные аргументы являются опциональными.
-        По умолчанию будут скачаны все книги и картинки со всех доступных страниц
+        По умолчанию будут скачаны все книги и картинки
+        со всех доступных страниц
         в заранее определённые папки в корневом каталоге проекта."""
     )
     parser.add_argument(
@@ -97,12 +98,17 @@ def get_books_rel_paths(url, genre, start_page, end_page):
     return paths
 
 
-def save_as_json(books_info, dest_folder, json_path, filename="books_info"):
+def save_as_json(
+        books_descriptions,
+        dest_folder,
+        json_path,
+        filename="books_descriptions"
+    ):
     folder = json_path if json_path else dest_folder
     Path(folder).mkdir(parents=True, exist_ok=True)
     path = Path(f"{folder}/{filename}.json")
     with open(path, "w", encoding="utf8") as file:
-        json.dump(books_info, file, ensure_ascii=False)
+        json.dump(books_descriptions, file, ensure_ascii=False)
 
 
 def main():
@@ -121,7 +127,7 @@ def main():
         start_page,
         end_page,
     )
-    books_info = []
+    books_descriptions = []
     for path in books_rel_paths:
         book_url = urljoin(url, path)
         txt_url = f"{url}txt.php"
@@ -134,7 +140,12 @@ def main():
             parsed_page = parse_book_page(soup)
             if not skip_txt:
                 txt_name = sanitize_filename(f"{parsed_page['title']}.txt")
-                book_path = download_txt(txt_url, params, txt_name, dest_folder)
+                book_path = download_txt(
+                    txt_url,
+                    params,
+                    txt_name,
+                    dest_folder,
+                )
                 parsed_page["book_path"] = book_path
             if not skip_imgs:
                 pic_url = urljoin(book_url, parsed_page['pic_rel_path'])
@@ -143,7 +154,7 @@ def main():
                 parsed_page["img_src"] = pic_path
                 parsed_page.pop("pic_rel_path")
                 parsed_page.pop("pic_name")
-            books_info.append(parsed_page)
+            books_descriptions.append(parsed_page)
         except requests.exceptions.HTTPError as error:
             print(error)
             continue
@@ -153,7 +164,7 @@ def main():
         except Exception as error:
             print(error)
             continue
-    save_as_json(books_info, dest_folder, json_path)
+    save_as_json(books_descriptions, dest_folder, json_path)
 
 
 if __name__ == "__main__":

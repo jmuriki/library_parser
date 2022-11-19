@@ -11,7 +11,10 @@ from pathvalidate import sanitize_filename
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(description="Опциональные аргументы. По умолчанию 1 и 10 соответственно.")
+    parser = argparse.ArgumentParser(
+        description="""Опциональные аргументы.
+        По умолчанию 1 и 10 соответственно."""
+    )
     parser.add_argument("-s", "--start_id", default=1, type=int)
     parser.add_argument("-e", "--end_id", default=10, type=int)
     return parser

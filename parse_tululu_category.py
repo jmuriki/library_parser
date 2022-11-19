@@ -52,8 +52,8 @@ def create_parser():
         type=int,
         help="""Введите номер конечной страницы.
                 Если не вводить номер начальной страницы,
-                будут скачаны все доступные страницы с первой по конечную
-                (без включения конечной)."""
+                будут скачаны все доступные страницы
+                с первой по конечную включительно."""
     )
     parser.add_argument(
         "-f",
@@ -85,14 +85,30 @@ def create_parser():
     return parser
 
 
-def get_books_rel_paths(url, genre, start_page, end_page):
+def get_stop_page(url, genre, end_page):
+    first_page_url = f"{url}l{genre}/1/"
+    soup = get_soup(first_page_url)
+    npages = [npage.text for npage in soup.select(".npage")]
+    max_page = int(npages[-1]) if npages else 1
+    stop_page = (max_page + 1) if max_page <= end_page else (end_page + 1)
+    return stop_page
+
+
+def get_books_rel_paths(url, genre, start_page, stop_page):
     paths = []
-    for page in range(start_page, end_page):
+    for page in range(start_page, stop_page):
         genre_url = f"{url}l{genre}/{page}/"
         try:
             soup = get_soup(genre_url)
-        except requests.exceptions.HTTPError:
-            break
+        except requests.exceptions.HTTPError as error:
+            print(error)
+            continue
+        except requests.exceptions.ConnectionError:
+            time.sleep(1)
+            continue
+        except Exception as error:
+            print(error)
+            continue
         tables = soup.select("table.d_book")
         paths.extend([table.select_one("a")["href"] for table in tables])
     return paths
@@ -121,11 +137,12 @@ def main():
     skip_txt = arguments.skip_txt
     json_path = arguments.json_path
     url = "https://tululu.org/"
+    stop_page = get_stop_page(url, genre, end_page)
     books_rel_paths = get_books_rel_paths(
         url,
         genre,
         start_page,
-        end_page,
+        stop_page,
     )
     books_descriptions = []
     for path in books_rel_paths:

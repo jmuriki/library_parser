@@ -9,14 +9,10 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
 
-from library_parser import check_for_redirect
 from library_parser import get_soup
-from library_parser import split_title_tag
 from library_parser import parse_book_page
 from library_parser import download_txt
 from library_parser import download_image
-from library_parser import get_genres
-from library_parser import get_comments_texts
 
 
 def create_parser():

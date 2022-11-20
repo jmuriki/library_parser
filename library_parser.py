@@ -130,9 +130,6 @@ def main():
             print(requests.exceptions.ConnectionError)
             time.sleep(1)
             continue
-        except Exception as error:
-            print(error)
-            continue
     save_comments(comments_guide)
 
 

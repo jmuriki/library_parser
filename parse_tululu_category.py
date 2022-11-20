@@ -102,9 +102,6 @@ def get_books_rel_paths(url, genre, start_page, stop_page):
         except requests.exceptions.ConnectionError:
             time.sleep(1)
             continue
-        except Exception as error:
-            print(error)
-            continue
         tables = soup.select("table.d_book")
         paths.extend([table.select_one("a")["href"] for table in tables])
     return paths
@@ -173,9 +170,6 @@ def main():
             continue
         except requests.exceptions.ConnectionError:
             time.sleep(1)
-            continue
-        except Exception as error:
-            print(error)
             continue
     save_as_json(books_descriptions, dest_folder, json_path)
 

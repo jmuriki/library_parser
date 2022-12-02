@@ -4,33 +4,40 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
     <title>Цифровая библиотека</title>
   </head>
   <body>
-    {% for description in books_descriptions %}
-      <div class="card mb-3" style="max-width: 540px;">
-        <div class="row no-gutters">
-          <div class="col-md-4">
-            {% if description['img_src'] == 'images/nopic.gif' %}
-              <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
-            {% else %}
-              <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Обложка книги {{description['title']}}">
-            {% endif %}
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">{{description['title']}}</h5>
-              <p class="card-text">{{description['author']}}</p>
-              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+    <div class="container">
+      <div class="row">
+        {% for descriptions_block in books_descriptions %}
+          {% for description in descriptions_block %}
+            <div class="col">
+              <div class="card mb-3" style="max-width: 540px;">
+                <div class="row no-gutters">
+                  <div class="col-md-4">
+                    {% if description['img_src'] == 'images/nopic.gif' %}
+                      <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
+                    {% else %}
+                      <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Обложка книги {{description['title']}}">
+                    {% endif %}
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title">{{description['title']}}</h5>
+                      <p class="card-text">{{description['author']}}</p>
+                      <p class="card-text"><small class="text-muted">Last updated ...</small></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          {% endfor %}
+          <div class="w-100"></div>
+        {% endfor %}
       </div>
-    {% endfor %}
+    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

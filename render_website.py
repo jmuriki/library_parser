@@ -1,6 +1,7 @@
 import json
 
 from livereload import Server
+from more_itertools import chunked
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
@@ -10,6 +11,7 @@ def on_reload():
 	for description in books_descriptions:
 		description["book_path"] = description["book_path"].replace("\\", "/")
 		description["img_src"] = description["img_src"].replace("\\", "/")
+	books_descriptions = [chunk for chunk in chunked(books_descriptions, 2)]
 	env = Environment(
 	    loader=FileSystemLoader('.'),
 	    autoescape=select_autoescape(['html', 'xml'])

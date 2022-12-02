@@ -18,16 +18,16 @@
                 <div class="row no-gutters">
                   <div class="col-md-4">
                     {% if description['img_src'] == 'images/nopic.gif' %}
-                      <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
+                      <img src="../{{description['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
                     {% else %}
-                      <img src="{{description['img_src']|urlencode}}" class="card-img" alt="Обложка книги {{description['title']}}">
+                      <img src="../{{description['img_src']|urlencode}}" class="card-img" alt="Обложка книги {{description['title']}}">
                     {% endif %}
                   </div>
                   <div class="col-md-8">
                     <div class="card-body">
                       <h5 class="card-title">{{description['title']}}</h5>
                       <p class="card-text">{{description['author']}}</p>
-                      <a href="{{description['book_path']|urlencode}}" target="_blank">Читать</a>
+                      <a href="../{{description['book_path']|urlencode}}" target="_blank">Читать</a>
                     </div>
                   </div>
                 </div>

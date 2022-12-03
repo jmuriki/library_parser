@@ -4,6 +4,8 @@
 
 Пример готового сайта можно увидеть [здесь](https://jmuriki.github.io/library_parser/).
 
+![image](./library.png)
+
 
 ## Установка
 

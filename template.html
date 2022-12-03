@@ -16,19 +16,19 @@
           {% if number == 1 %}
             <li class="page-item disabled"><a class="page-link" tabindex="-1" aria-disabled="true">Назад</a></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="./index{{number - 1}}.html">Назад</a></li>
+            <li class="page-item"><a class="page-link" href="../pages/index{{number - 1}}.html">Назад</a></li>
           {% endif %}
           {% for num in pages_nums %}
             {% if num == number %}
-              <li class="page-item active" aria-current="page"><a class="page-link" href="./index{{num}}.html">{{num}}<span class="sr-only">(current)</span></a></li>
+              <li class="page-item active" aria-current="page"><a class="page-link" href="../pages/index{{num}}.html">{{num}}<span class="sr-only">(current)</span></a></li>
             {% else %}
-              <li class="page-item"><a class="page-link" href="./index{{num}}.html">{{num}}</a></li>
+              <li class="page-item"><a class="page-link" href="../pages/index{{num}}.html">{{num}}</a></li>
             {% endif %}
           {% endfor %}
           {% if number == pages_nums[-1] %}
             <li class="page-item disabled"><a class="page-link" tabindex="-1" aria-disabled="true">Вперёд</a></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="./index{{number + 1}}.html">Вперёд</a></li>
+            <li class="page-item"><a class="page-link" href="../pages/index{{number + 1}}.html">Вперёд</a></li>
           {% endif %}
         </ul>
       </nav>

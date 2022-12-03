@@ -43,7 +43,11 @@ def on_reload():
         if number == 1:
             with open(f"./index.html", "w", encoding="utf8") as file:
                 file.write(rendered_page.replace("./", "/"))
-        with open(f"./{pages_folder_name}/index{number}.html", "w", encoding="utf8") as file:
+        with open(
+                f"./{pages_folder_name}/index{number}.html",
+                "w",
+                encoding="utf8",
+        ) as file:
             file.write(rendered_page)
 
 

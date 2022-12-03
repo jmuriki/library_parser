@@ -13,30 +13,30 @@
       <nav aria-label="Page navigation example">
         <ul class="pagination">
           <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          {% for num in pages_nums %}
+            <li class="page-item"><a class="page-link" href="./index{{num}}.html">{{num}}</a></li>
+          {% endfor %}
           <li class="page-item"><a class="page-link" href="#">Next</a></li>
         </ul>
       </nav>
       <div class="row">
-        {% for descriptions_block in books_descriptions %}
-          {% for description in descriptions_block %}
+        {% for line in page %}
+          {% for desc in line %}
             <div class="col">
               <div class="card mb-3" style="max-width: 540px;">
                 <div class="row no-gutters">
                   <div class="col-md-4">
-                    {% if description['img_src'] == 'images/nopic.gif' %}
-                      <img src="../{{description['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
+                    {% if desc['img_src'] == 'images/nopic.gif' %}
+                      <img src="../{{desc['img_src']|urlencode}}" class="card-img" alt="Нет изображения">
                     {% else %}
-                      <img src="../{{description['img_src']|urlencode}}" class="card-img" alt="Обложка книги {{description['title']}}">
+                      <img src="../{{desc['img_src']|urlencode}}" class="card-img" alt="Обложка книги '{{desc['title']}}'">
                     {% endif %}
                   </div>
                   <div class="col-md-8">
                     <div class="card-body">
-                      <h5 class="card-title">{{description['title']}}</h5>
-                      <p class="card-text">{{description['author']}}</p>
-                      <a href="../{{description['book_path']|urlencode}}" target="_blank">Читать</a>
+                      <h5 class="card-title">{{desc['title']}}</h5>
+                      <p class="card-text">{{desc['author']}}</p>
+                      <a href="../{{desc['book_path']|urlencode}}" target="_blank">Читать</a>
                     </div>
                   </div>
                 </div>

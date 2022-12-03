@@ -48,6 +48,11 @@
                     <div class="card-body">
                       <h5 class="card-title">{{desc['title']}}</h5>
                       <p class="card-text">{{desc['author']}}</p>
+                      <h6>
+                        {% for genre in desc['genres'] %}
+                          <span class="badge badge-light">{{genre}}</span>
+                        {% endfor %}
+                      </h6>
                       <a href="../{{desc['book_path']|urlencode}}" target="_blank">Читать</a>
                     </div>
                   </div>

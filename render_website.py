@@ -6,26 +6,41 @@ from more_itertools import chunked
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
-def on_reload():
-	pages_folder = "pages"
-	Path(f"./{pages_folder}").mkdir(parents=True, exist_ok=True)
+def get_descs():
 	with open("books_descriptions.json", "r") as file:
-		books_descriptions = json.load(file)
-	for description in books_descriptions:
-		description["book_path"] = description["book_path"].replace("\\", "/")
-		description["img_src"] = description["img_src"].replace("\\", "/")
-	paged_descriptions = [chunk for chunk in chunked(books_descriptions, 20)]
-	packed_descriptions = [[chunk for chunk in chunked(page, 2)] for page in paged_descriptions]
+		descs = json.load(file)
+	for desc in descs:
+		desc["book_path"] = desc["book_path"].replace("\\", "/")
+		desc["img_src"] = desc["img_src"].replace("\\", "/")
+	return descs
+
+
+def arrange_descs(descs):
+	descs_per_line = 2
+	lines_per_page = 10
+	lined_descs = [chunk for chunk in chunked(descs, descs_per_line)]
+	paged_descs = [chunk for chunk in chunked(lined_descs, lines_per_page)]
+	return paged_descs
+
+
+def on_reload():
+	descs = get_descs()
+	pages_folder_name = "pages"
+	Path(f"./{pages_folder_name}").mkdir(parents=True, exist_ok=True)
+	paged_descs = arrange_descs(descs)
 	env = Environment(
 	    loader=FileSystemLoader("."),
 	    autoescape=select_autoescape(["html", "xml"])
 	)
 	template = env.get_template("template.html")
-	for number, page in enumerate(packed_descriptions):
+	pages_nums = [num for num, _ in enumerate(paged_descs, 1)]
+	for number, page in enumerate(paged_descs, 1):
 		rendered_page = template.render(
-		    books_descriptions = page,
+		    pages_nums = pages_nums,
+		    number = number,
+		    page = page,
 		)
-		with open(f"./{pages_folder}/index{number + 1}.html", "w", encoding="utf8") as file:
+		with open(f"./{pages_folder_name}/index{number}.html", "w", encoding="utf8") as file:
 		    file.write(rendered_page)
 
 

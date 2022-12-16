@@ -1,11 +1,9 @@
-import os
 import json
 import time
 import requests
 import argparse
 
 from pathlib import Path
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pathvalidate import sanitize_filename
 
@@ -108,11 +106,11 @@ def get_books_rel_paths(url, genre, start_page, stop_page):
 
 
 def save_as_json(
-        books_descriptions,
-        dest_folder,
-        json_path,
-        filename="books_descriptions"
-    ):
+            books_descriptions,
+            dest_folder,
+            json_path,
+            filename="books_descriptions"
+        ):
     folder = json_path if json_path else dest_folder
     Path(folder).mkdir(parents=True, exist_ok=True)
     path = Path(f"{folder}/{filename}.json")
@@ -143,7 +141,7 @@ def main():
         txt_url = f"{url}txt.php"
         book_id = path.strip("/b")
         params = {
-        "id": book_id
+            "id": book_id
         }
         try:
             soup = get_soup(book_url)

@@ -36,12 +36,12 @@ def on_reload():
     pages_nums = [num for num, _ in enumerate(paged_descs, 1)]
     for number, page in enumerate(paged_descs, 1):
         rendered_page = template.render(
-            pages_nums = pages_nums,
-            number = number,
-            page = page,
+            pages_nums=pages_nums,
+            number=number,
+            page=page,
         )
         if number == 1:
-            with open(f"./index.html", "w", encoding="utf8") as file:
+            with open("./index.html", "w", encoding="utf8") as file:
                 file.write(rendered_page.replace("./", "/"))
         with open(
                 f"./{pages_folder_name}/index{number}.html",

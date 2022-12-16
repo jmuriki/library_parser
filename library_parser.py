@@ -7,7 +7,7 @@ from tqdm import tqdm
 from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from pathvalidate import sanitize_filename
+from pathvalidate import sanitize_filename as sanitize_name
 
 
 def create_parser():
@@ -44,7 +44,7 @@ def split_title_tag(soup):
 def get_genres(soup):
     genres_tags = soup.select("span.d_book a")
     genres = [tag.text for tag in genres_tags]
-    return genres 
+    return genres
 
 
 def get_comments_texts(soup):
@@ -58,7 +58,8 @@ def parse_book_page(soup):
     parsed_page['title'], parsed_page['author'] = split_title_tag(soup)
     parsed_page['genres'] = get_genres(soup)
     parsed_page['comments'] = get_comments_texts(soup)
-    parsed_page['pic_rel_path'] = soup.select_one("body div.bookimage img")["src"]
+    parsed_page['pic_rel_path'] = soup.select_one(
+        "body div.bookimage img")["src"]
     parsed_page['pic_name'] = os.path.split(parsed_page['pic_rel_path'])[-1]
     return parsed_page
 
@@ -95,7 +96,11 @@ def download_image(pic_url, pic_name, dest_folder=".", folder="images"):
     return str(path)
 
 
-def save_comments(comments_guide, filename="Гид по отзывам.txt", folder="books/"):
+def save_comments(
+            comments_guide,
+            filename="Гид по отзывам.txt",
+            folder="books/"
+        ):
     Path(f"./{folder}").mkdir(parents=True, exist_ok=True)
     path = Path(f"./{folder}{filename}")
     with open(path, "w") as file:
@@ -111,13 +116,13 @@ def main():
     for book_id in tqdm(range(start_id, end_id + 1)):
         txt_url = f"{url}txt.php"
         params = {
-        "id": book_id
+            "id": book_id
         }
         book_url = f"{url}b{book_id}/"
         try:
             soup = get_soup(book_url)
             parsed_page = parse_book_page(soup)
-            txt_name = sanitize_filename(f"{book_id}. {parsed_page['title']}.txt")
+            txt_name = sanitize_name(f"{book_id}. {parsed_page['title']}.txt")
             download_txt(txt_url, params, txt_name)
             pic_url = urljoin(book_url, parsed_page['pic_rel_path'])
             pic_name = parsed_page['pic_name']
